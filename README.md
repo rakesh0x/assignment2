@@ -1,48 +1,44 @@
-hey, so this is my little weather + orders thing
+assignment 2 - weather based order updater
 
-basically i had this problem where orders kept getting delayed because of bad weather, and nobody told the customers anything. so i built this small script that checks the weather for each order city and updates stuff on its own.
+hey, this is my assignment submission for the async order processing task.
 
-what it does
-- reads all the orders from order.json
-- hits the openweather api for every city, all at once (asyncio + aiohttp so its fast)
-- if its raining, snowing, or something extreme, it marks that order as delayed
-- it also writes a small apology message for the customer, like hey your order is late because of heavy rain, that kind of thing
-- if the weather is fine, it just keeps the order as pending and removes any old apology
-- logs everything so you can see what happened
+what i was asked to do
+- read orders from a json file
+- fetch live weather for each city using an api
+- do it concurrently with asyncio, not one by one
+- if weather is bad (rain, snow, extreme), mark the order as delayed and add an apology message
+- handle api errors properly without crashing
 
-files in here
-- main.py -> all the logic lives here
-- order.json -> your orders list, this is what gets updated
-- .env -> this is where your api key goes (not pushed to github)
+how i did it
+- used asyncio + aiohttp so all the weather calls run at the same time with asyncio.gather
+- used openweathermap api for live weather data
+- read and updated everything in order.json
+- used logging to show what is happening for each city
+- wrapped the api call in try / except so one bad city doesnt stop the rest
 
-how to run it
-1. clone this repo
-2. make a .env file and add your key like this:
+files submitted
+- main.py -> my full solution
+- order.json -> input orders + updated output with status and apology
+- .env -> has my openweather_api_key (not uploaded to github)
+- readme.md -> this file
+
+how to run my code
+1. clone my repo
+2. create a .env file with:
    openweather_api_key=your_key_here
-   you can get one for free from openweathermap.org
-3. install what you need:
+3. install dependencies:
    pip install aiohttp python-dotenv
-4. add your orders to order.json, something like:
-   [
-     {
-       "order_id": "1001",
-       "customer": "alice smith",
-       "city": "new york",
-       "status": "pending"
-     }
-   ]
-5. just run it:
+4. run:
    python3 main.py
 
-what an order looks like after
-- good weather:
-  status stays pending, no apology
-- bad weather:
-  status becomes delayed, and you get something like:
+sample logic
+- if weather is clear or clouds -> status = pending, no apology
+- if weather is rain / snow / extreme -> status = delayed, plus a message like:
   hi bob jones, your order to mumbai is delayed due to heavy rain. we appreciate your interest
 
-a quick note
-- if a city name is wrong or the api fails, it just logs the error and moves on, it wont crash the whole thing
-- be nice with the free api tier, dont spam it too much
+error handling i added
+- if api returns non-200, i log the http error and skip that order
+- if city is invalid, i log it and continue with other orders
+- if api key is missing, i raise a clear error at startup
 
-thats pretty much it. small script, does one job, saves a lot of manual checking.
+thats it. thanks for checking my assignment.
